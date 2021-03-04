@@ -74,8 +74,8 @@ using namespace PhysiCell;
 
 // any additional cell types (beyond cell_defaults)
 
-extern Cell_Definition fibroblast; 
-extern Cell_Definition organoid_cell; 
+// extern Cell_Definition fibroblast;  //rwh
+// extern Cell_Definition organoid_cell;  //rwh
 
 // custom cell phenotype functions could go here 
 

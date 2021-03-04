@@ -181,6 +181,7 @@
 						<rate start_index="0" end_index="0" fixed_duration="false">0.000072</rate>
 					</phase_transition_rates>
 				</cycle>
+				
 				<death>  
 					<model code="100" name="apoptosis"> 
 						<death_rate units="1/min">0</death_rate> <!-- 5.31667e-05 --> 

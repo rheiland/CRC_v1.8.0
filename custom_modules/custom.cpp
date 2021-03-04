@@ -84,11 +84,11 @@ extern "C" rrc::RRHandle createRRInstance();
 // #include <vector>
 #include <string>
 
-
-Cell_Definition fibroblast; 
-Cell_Definition KRAS_positive;
-Cell_Definition KRAS_negative;
-Cell_Definition test; 
+//rwh - comment out due to reading in from XML
+// Cell_Definition fibroblast; 
+// Cell_Definition KRAS_positive;
+// Cell_Definition KRAS_negative;
+// Cell_Definition test; 
 
 void create_cell_types( void )
 {
@@ -420,14 +420,18 @@ void setup_tissue( void )
 	// create some cells near the origin
 	
 	Cell* pCell;
-   int retval;
+    int retval;
+    static Cell_Definition* pDefault = find_cell_definition("default");
+    static Cell_Definition* pKRAS_pos = find_cell_definition("KRAS_positive");
+    static Cell_Definition* pKRAS_neg = find_cell_definition("KRAS_negative");
+
 
     // 20,000 fibroblast seeding
     if (parameters.bools("test_cell_seeding"))
     {
         std::cout << "creating cell" << std::endl;
 		
-        pCell = create_cell(test);
+        pCell = create_cell( *pDefault );
         pCell->assign_position(0,0,0);
         std::cout << "I passed seeding" << std::endl;
         if (parameters.bools("create_SBML")) {
@@ -505,7 +509,8 @@ void setup_tissue( void )
                         positions[i][0] += xrand;//(rand() % 5333) - 2666;
                         positions[i][1] += yrand;//(rand() % 961) - 480;
                         positions[i][2] += zrand;//(rand() % 5333) - 2666;
-                        pCell = create_cell(KRAS_positive);
+                        // pCell = create_cell(KRAS_positive);
+                        pCell = create_cell( *pKRAS_pos );
                         pCell->assign_position( positions[i] );
                         if (parameters.bools("create_SBML")) {
                             // Adding SBML model to cells
@@ -544,7 +549,8 @@ void setup_tissue( void )
                         positions[i][0] += xrand;//(rand() % 5333) - 2666;
                         positions[i][1] += yrand;//(rand() % 961) - 480;
                         positions[i][2] += zrand;//(rand() % 5333) - 2666;
-                        pCell = create_cell(KRAS_negative);
+                        // pCell = create_cell(KRAS_negative);
+                        pCell = create_cell( *pKRAS_neg);
                         pCell->assign_position( positions[i] );
                         if (parameters.bools("create_SBML")) {
                             // Adding SBML model to cells
@@ -583,7 +589,8 @@ void setup_tissue( void )
                         positions[i][0] += xrand;//(rand() % 5333) - 2666;
                         positions[i][1] += yrand;//(rand() % 961) - 480;
                         positions[i][2] += zrand;//(rand() % 5333) - 2666;
-                        pCell = create_cell(KRAS_positive);
+                        // pCell = create_cell(KRAS_positive);
+                        pCell = create_cell( *pKRAS_pos );
                         pCell->assign_position( positions[i] );
                         if (parameters.bools("create_SBML")) {
                             // Adding SBML model to cells
@@ -619,7 +626,8 @@ void setup_tissue( void )
                         positions[i][0] += xrand;//(rand() % 5333) - 2666;
                         positions[i][1] += yrand;//(rand() % 961) - 480;
                         positions[i][2] += zrand;//(rand() % 5333) - 2666;
-                        pCell = create_cell(KRAS_negative);
+                        // pCell = create_cell(KRAS_negative);
+                        pCell = create_cell( *pKRAS_neg );
                         pCell->assign_position( positions[i] );
                         if (parameters.bools("create_SBML")) {
                             // Adding SBML model to cells
