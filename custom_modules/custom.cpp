@@ -72,8 +72,8 @@ int energy_vi;
 
 // These are for C
 //#define STATIC_RRC
-#include "rrc_api.h"
-#include "rrc_types.h"
+// #include "rrc_api.h"
+// #include "rrc_types.h"
 // #include "rrc_utilities.h"
 // extern "C" rrc::RRHandle createRRInstance();
 
@@ -799,8 +799,8 @@ void update_coarse_microenvironment(void)
 
 void simulate_SBML_for_cell(Cell* pCell, Phenotype& phenotype , double dt)
 {   
-	rrc::RRVectorPtr vptr;
-	rrc::RRCDataPtr result;  // start time, end time, and number of points
+	// rrc::RRVectorPtr vptr;
+	// rrc::RRCDataPtr result;  // start time, end time, and number of points
 
 	if( pCell->phenotype.death.dead == false && pCell->type == 1 )
     {
@@ -906,19 +906,24 @@ void simulate_SBML_for_cell(Cell* pCell, Phenotype& phenotype , double dt)
 
 
 
-        pCell->custom_data[i_Glu_i]  = result->Data[7];
-        pCell->custom_data[i_Oxy_i]  = result->Data[8];
-        pCell->custom_data[energy_vi]  = result->Data[9];
+        // pCell->custom_data[i_Glu_i]  = result->Data[7];
+        // pCell->custom_data[i_Oxy_i]  = result->Data[8];
+        // pCell->custom_data[energy_vi]  = result->Data[9];
+        pCell->custom_data[i_Glu_i] = pCell->phenotype.intracellular->get_double_parameter_value("Glucose");
+        pCell->custom_data[i_Oxy_i] = pCell->phenotype.intracellular->get_double_parameter_value("Oxygen");
+        pCell->custom_data[energy_vi] = pCell->phenotype.intracellular->get_double_parameter_value("Energy");
         //std::cout << "Energy: " << pCell->custom_data[energy_vi] << std::endl;
-        pCell->custom_data[i_Lac_i] = result->Data[10];
-        pCell->custom_data[i_Glt_i] = result->Data[11];
+        // pCell->custom_data[i_Lac_i] = result->Data[10];
+        // pCell->custom_data[i_Glt_i] = result->Data[11];
+        pCell->custom_data[i_Lac_i] = pCell->phenotype.intracellular->get_double_parameter_value("Lactate");
+        pCell->custom_data[i_Glt_i] = pCell->phenotype.intracellular->get_double_parameter_value("Glutamine");
         
         
         phenotype.molecular.internalized_total_substrates[i_Glu] = pCell->custom_data[i_Glu_i]*cell_volume;
         phenotype.molecular.internalized_total_substrates[i_Oxy] = pCell->custom_data[i_Oxy_i]*cell_volume;
         phenotype.molecular.internalized_total_substrates[i_Lac] = pCell->custom_data[i_Lac_i]*cell_volume;
         phenotype.molecular.internalized_total_substrates[i_Glt] = pCell->custom_data[i_Glt_i]*cell_volume;
-        freeRRCData (result);
+        // freeRRCData (result);
     }
 
     if( pCell->phenotype.death.dead == false && pCell->type == 2 )
@@ -968,7 +973,8 @@ void simulate_SBML_for_cell(Cell* pCell, Phenotype& phenotype , double dt)
         // Result Indicing!!!!!
 
         //std::cout << "Energy: " << pCell->custom_data[energy_vi] << std::endl;
-        pCell->custom_data[i_Lac_i] = result->Data[3];
+        // pCell->custom_data[i_Lac_i] = result->Data[3];
+        pCell->custom_data[i_Lac_i] = pCell->phenotype.intracellular->get_double_parameter_value("Lactate");
 
         phenotype.molecular.internalized_total_substrates[i_Lac] = pCell->custom_data[i_Lac_i]*cell_volume;
     //    freeRRCData (result);
