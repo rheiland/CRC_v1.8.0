@@ -1144,6 +1144,7 @@ void build_cell_definitions_maps( void )
 //	cell_definitions_by_name.
 //	cell_definitions_by_index
 
+    std::cout << __FUNCTION__ << ": ---------- cell_definitions_by_index.size() = " << cell_definitions_by_index.size() << std::endl;
 	for( int n=0; n < cell_definitions_by_index.size() ; n++ )
 	{
 		Cell_Definition* pCD = cell_definitions_by_index[n]; 
@@ -2073,6 +2074,47 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		}
 	}	
 
+	// intracellular
+	
+	node = cd_node.child( "phenotype" );
+	node = node.child( "intracellular" ); 
+	if( node )
+	{
+		std::string model_type = node.attribute( "type" ).value(); 
+		
+#ifdef ADDON_PHYSIBOSS
+		if (model_type == "maboss") {
+			// If it has already be copied
+			if (pParent != NULL && pParent->phenotype.intracellular != NULL) {
+				pCD->phenotype.intracellular->initialize_intracellular_from_pugixml(node);
+				
+			// Otherwise we need to create a new one
+			} else {
+				MaBoSSIntracellular* pIntra = new MaBoSSIntracellular(node);
+				pCD->phenotype.intracellular = pIntra->getIntracellularModel();
+			}
+		}
+#endif
+
+#ifdef ADDON_ROADRUNNER
+		if (model_type == "roadrunner") 
+        {
+			// If it has already be copied
+			if (pParent != NULL && pParent->phenotype.intracellular != NULL) 
+            {
+                std::cout << "------ " << __FUNCTION__ << ": copying another\n";
+				pCD->phenotype.intracellular->initialize_intracellular_from_pugixml(node);
+            }	
+			// Otherwise we need to create a new one
+			else 
+            {
+                std::cout << "\n------ " << __FUNCTION__ << ": creating new RoadRunnerIntracellular\n";
+				RoadRunnerIntracellular* pIntra = new RoadRunnerIntracellular(node);
+				pCD->phenotype.intracellular = pIntra->getIntracellularModel();
+			}
+		}
+#endif
+	}	
 	
 	// set up custom data 
 	node = cd_node.child( "custom_data" );
