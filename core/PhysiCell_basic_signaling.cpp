@@ -64,27 +64,95 @@
 #                                                                             #
 ###############################################################################
 */
+ 
+#include "./PhysiCell_basic_signaling.h"
 
-#ifndef __PhysiCell_h__
-#define __PhysiCell_h__
+using namespace BioFVM; 
 
-#include <iostream>
-#include <fstream>
-#include <string>
+namespace PhysiCell{
+	
+Integrated_Signal::Integrated_Signal()
+{
+	base_activity = 0.0; 
+	max_activity = 1.0; 
+	
+	promoters.clear(); 
+	promoter_weights.clear(); 
+	
+	promoters_half_max = 0.1;
+	promoters_Hill = 4; 
+	
+	inhibitors.clear(); 
+	inhibitor_weights.clear(); 
+	
+	inhibitors_half_max = 0.1; 
+	inhibitors_Hill = 4; 
+	
+	return; 
+}
 
-static std::string PhysiCell_Version = "1.8.0-preview"; 
-static std::string PhysiCell_URL = "http://PhysiCell.MathCancer.org"; 
-static std::string PhysiCell_DOI = "10.1371/journal.pcbi.1005991"; 
+void Integrated_Signal::reset( void )
+{
+	promoters.clear(); 
+	promoter_weights.clear(); 
 
-#include "PhysiCell_basic_signaling.h"
-#include "PhysiCell_phenotype.h"
-#include "PhysiCell_standard_models.h"
-#include "PhysiCell_cell.h"
-#include "PhysiCell_cell_container.h"
-// #include "PhysiCell_digital_cell_line.h" // to be deprecated! 
-#include "PhysiCell_utilities.h"
-#include "PhysiCell_constants.h"
+	inhibitors.clear(); 
+	inhibitor_weights.clear(); 
+	return; 
+}
 
+double Integrated_Signal::compute_signal( void )
+{
+	double pr = 0.0; 
+	double w = 0.0; 
+	for( int k=0 ; k < promoters.size() ; k++ )
+	{ pr += promoters[k]; w += promoter_weights[k]; } 
+	w += 1e-16; 
+	pr /= w; 
+	
+	double inhib = 0.0; 
+	w = 0.0; 
+	for( int k=0 ; k < inhibitors.size() ; k++ )
+	{ inhib += inhibitors[k]; w += inhibitor_weights[k]; } 
+	w += 1e-16; 
+	inhib /= w; 
+	
+	double Pn = pow( pr , promoters_Hill ); 
+	double Phalf = pow( promoters_half_max , promoters_Hill ); 
 
+	double In = pow( inhib , inhibitors_Hill ); 
+	double Ihalf = pow( inhibitors_half_max , inhibitors_Hill ); 
+	
+	double P = Pn / ( Pn + Phalf ); 
+	double I = 1.0 / ( In + Ihalf ); 
+	
+	double output = max_activity; 
+	output -= base_activity; //(max-base)
+	output *= P; // (max-base)*P 
+	output += base_activity; // base + (max-base)*P 
+	output *= I; // (base + (max-base)*P)*I; 
 
-#endif
+	return output; 
+};
+
+void Integrated_Signal::add_signal( char signal_type , double signal , double weight )
+{
+	if( signal_type == 'P' || signal_type == 'p' )
+	{
+		promoters.push_back( signal ); 
+		promoter_weights.push_back( weight ); 
+		return; 
+	}
+	if( signal_type == 'I' || signal_type == 'i' )
+	{
+		inhibitors.push_back( signal ); 
+		inhibitor_weights.push_back( weight ); 
+		return; 
+	}
+	return; 
+}
+
+void Integrated_Signal::add_signal( char signal_type , double signal )
+{ return add_signal( signal_type , signal , 1.0 ); }
+
+}; 

@@ -64,27 +64,48 @@
 #                                                                             #
 ###############################################################################
 */
-
-#ifndef __PhysiCell_h__
-#define __PhysiCell_h__
-
-#include <iostream>
-#include <fstream>
+ 
+#include <vector>
 #include <string>
 
-static std::string PhysiCell_Version = "1.8.0-preview"; 
-static std::string PhysiCell_URL = "http://PhysiCell.MathCancer.org"; 
-static std::string PhysiCell_DOI = "10.1371/journal.pcbi.1005991"; 
+#ifndef __PhysiCell_basic_signaling__
+#define __PhysiCell_basic_signaling__
 
-#include "PhysiCell_basic_signaling.h"
-#include "PhysiCell_phenotype.h"
-#include "PhysiCell_standard_models.h"
-#include "PhysiCell_cell.h"
-#include "PhysiCell_cell_container.h"
-// #include "PhysiCell_digital_cell_line.h" // to be deprecated! 
-#include "PhysiCell_utilities.h"
-#include "PhysiCell_constants.h"
+#include "./PhysiCell.h"
 
+namespace PhysiCell{
+	
 
+// signal increases/decreases parameter
+// options: hill power
+// options: half max
 
-#endif
+class Integrated_Signal
+{
+ private:
+ public: 
+	double base_activity; 
+	double max_activity; 
+	
+	std::vector<double> promoters; 
+	std::vector<double> promoter_weights; 
+	double promoters_Hill;
+	double promoters_half_max; 
+	
+	std::vector<double> inhibitors; 
+	std::vector<double> inhibitor_weights; 
+	double inhibitors_Hill;
+	double inhibitors_half_max; 
+	
+	Integrated_Signal();
+	void reset( void ); 
+	
+	void add_signal( char signal_type , double signal , double weight ); 
+	void add_signal( char signal_type , double signal );
+
+	double compute_signal( void );
+};
+
+}; 
+
+#endif 
