@@ -414,81 +414,35 @@ void setup_1D_microenvironment( void )
 	return; 
 } 
 
-
 void setup_tissue( void )
 {
 	// create some cells near the origin
-	
 	Cell* pCell;
     int retval;
     static Cell_Definition* pDefault = find_cell_definition("default");
+    static Cell_Definition* pFibro = find_cell_definition("fibroblast");
     static Cell_Definition* pKRAS_pos = find_cell_definition("KRAS_positive");
     static Cell_Definition* pKRAS_neg = find_cell_definition("KRAS_negative");
 
-
     // 20,000 fibroblast seeding
-    if (parameters.bools("test_cell_seeding"))
-    {
-        std::cout << "creating cell" << std::endl;
-		
-        pCell = create_cell( *pDefault );
-        pCell->assign_position(0,0,0);
-        std::cout << "I passed seeding" << std::endl;
-        if (parameters.bools("create_SBML")) {
-                    std::cout << "Adding SBML for Test Cells" << std::endl;
-                    retval = pCell->phenotype.intracellular->start();
-
-                    // std::cerr << "------------->>>>>  Creating rrHandle, loadSBML file\n\n";
-                    // rrc::RRHandle rrHandle = createRRInstance();
-                    // if (!rrc::loadSBML (rrHandle, "CAF_Toy_Model.xml")) {
-                    //     std::cerr << "------------->>>>>  Error while loading SBML file  <-------------\n\n";
-                    // // 	printf ("Error message: %s\n", getLastError());
-                    // // 	getchar ();
-                    // // 	exit (0);
-                    // pCell->phenotype.molecular.model_rr = rrHandle;
-                    // }           
-        }
-    } 
-    
-    
-/*     if (parameters.bools("fibroblast_seeding"))
+    if (parameters.bools("fibroblast_seeding"))
     {
         std::cout << "creating fibroblasts" << std::endl;
-		
-        for (int i= -2666; i<2666; i+=16.82)
+        for (int i= -2666; i<2666; i+=16.82+20.8)
         {
-            for (int j= -2666; j<2666; j+=16.82)
+            for (int j= -2666; j<2666; j+=16.82+20.8)
             {			
-                pCell = create_cell(fibroblast);
-                pCell->assign_position(i,-500,j);	
-            }
-        } 	
-    } */
-  
-    /* double x_min = microenvironment.bounding_box[0];// -2880
-    double y_min = microenvironment.bounding_box[1];
-    double z_min = microenvironment.bounding_box[2];
-    double x_max = microenvironment.bounding_box[3];
-
-    if (parameters.bools("fibroblast_seeding"))
-        {
-            std::cout << "creating fibroblasts" << std::endl;
-            
-            
-            for (int i= xmin + initial_tumor_radius; i<2666; i+=16.82)
-            {
-                for (int j= -2666; j<2666; j+=16.82)
-                {			
-                    pCell = create_cell(fibroblast);
-                    pCell->assign_position(i,-500,j);	
-                }
+                // pCell = create_cell(fibroblast);
+                pCell = create_cell( *pFibro );
+                pCell->assign_position(i,-500,j);
             } 	
-        } */
+        }  
+    }
 
     double cell_radius = cell_defaults.phenotype.geometry.radius; 
     double initial_tumor_radius = 46; // parameters.doubles("initial_tumor_radius");
     double number_of_organoid = 250; //parameters.doubles("number_of_organoid")
-	
+    
 	if (parameters.bools("organoid_cell_seeding"))
 	{ 
             std::cout << "creating CRCs" << std::endl;
@@ -496,7 +450,6 @@ void setup_tissue( void )
             {
                 for (int i = 0; i < number_of_organoid; i++) // seeding number of organoid cells specified in PhysiCell_settings.xml
 			    {
-                
                     std::vector<std::vector<double>> positions = create_cell_sphere_positions(cell_radius,initial_tumor_radius); 
                     //std::cout << "creating " << positions.size() << " closely-packed organoid cells ... " << std::endl;
                     // create organoid
@@ -512,106 +465,12 @@ void setup_tissue( void )
                         // pCell = create_cell(KRAS_positive);
                         pCell = create_cell( *pKRAS_pos );
                         pCell->assign_position( positions[i] );
-                        if (parameters.bools("create_SBML")) {
-                            // Adding SBML model to cells
-                            std::cout << "Adding SBML for Organoids" << std::endl;
-                            retval = pCell->phenotype.intracellular->start();
-
-                            // std::cerr << "------------->>>>>  Creating rrHandle, loadSBML file\n\n";
-                            // rrc::RRHandle rrHandle = createRRInstance();
-                            // if (!rrc::loadSBML (rrHandle, "CRC_Toy_Model.xml")) {
-                            //     std::cerr << "------------->>>>>  Error while loading SBML file  <-------------\n\n";
-                            // // 	printf ("Error message: %s\n", getLastError());
-                            // // 	getchar ();
-                            // // 	exit (0);
-                            // }
-                            // pCell->phenotype.molecular.model_rr = rrHandle;  // assign the intracellular model to each cell
-                        }
-                        
-                        
                     }
 			    }
             }
-            if (parameters.doubles("organoid_cell_seeding_method") == 2)
+            else if (parameters.doubles("organoid_cell_seeding_method") == 2)
             {
                 for (int i = 0; i < number_of_organoid; i++) // seeding number of organoid cells specified in PhysiCell_settings.xml
-			    {
-                
-                    std::vector<std::vector<double>> positions = create_cell_sphere_positions(cell_radius,initial_tumor_radius); 
-                    //std::cout << "creating " << positions.size() << " closely-packed organoid cells ... " << std::endl;
-                    // create organoid
-                        double xrand = (rand() % 5333) - 2666;
-                        double yrand = (rand() % 961) - 480;
-                        double zrand = (rand() % 5333) - 2666;
-                    //std::cout << positions.size() << std::endl;
-                    for( int i=0; i < positions.size(); i++ )
-                    {
-                        positions[i][0] += xrand;//(rand() % 5333) - 2666;
-                        positions[i][1] += yrand;//(rand() % 961) - 480;
-                        positions[i][2] += zrand;//(rand() % 5333) - 2666;
-                        // pCell = create_cell(KRAS_negative);
-                        pCell = create_cell( *pKRAS_neg);
-                        pCell->assign_position( positions[i] );
-                        if (parameters.bools("create_SBML")) {
-                            // Adding SBML model to cells
-                            std::cout << "Adding SBML for Organoids" << std::endl;
-                            retval = pCell->phenotype.intracellular->start();
-
-                            // std::cerr << "------------->>>>>  Creating rrHandle, loadSBML file\n\n";
-                            // rrc::RRHandle rrHandle = createRRInstance();
-                            // if (!rrc::loadSBML (rrHandle, "CRC_Toy_Model.xml")) {
-                            //     std::cerr << "------------->>>>>  Error while loading SBML file  <-------------\n\n";
-                            // // 	printf ("Error message: %s\n", getLastError());
-                            // // 	getchar ();
-                            // // 	exit (0);
-                            // }
-                            // pCell->phenotype.molecular.model_rr = rrHandle;  // assign the intracellular model to each cell
-                        }
-                        
-                        
-                    }
-			    }
-            }
-            if (parameters.doubles("organoid_cell_seeding_method") == 3)
-            {
-                for (int i = 0; i < parameters.doubles("percent_KRAS_positive")*number_of_organoid; i++) // seeding number of organoid cells specified in PhysiCell_settings.xml
-			    {
-                
-                    std::vector<std::vector<double>> positions = create_cell_sphere_positions(cell_radius,initial_tumor_radius); 
-                    //std::cout << "creating " << positions.size() << " closely-packed organoid cells ... " << std::endl;
-                    // create organoid
-                        double xrand = (rand() % 5333) - 2666;
-                        double yrand = (rand() % 961) - 480;
-                        double zrand = (rand() % 5333) - 2666;
-                    //std::cout << positions.size() << std::endl;
-                    for( int i=0; i < positions.size(); i++ )
-                    {
-                        positions[i][0] += xrand;//(rand() % 5333) - 2666;
-                        positions[i][1] += yrand;//(rand() % 961) - 480;
-                        positions[i][2] += zrand;//(rand() % 5333) - 2666;
-                        // pCell = create_cell(KRAS_positive);
-                        pCell = create_cell( *pKRAS_pos );
-                        pCell->assign_position( positions[i] );
-                        if (parameters.bools("create_SBML")) {
-                            // Adding SBML model to cells
-                            std::cout << "Adding SBML for Organoids" << std::endl;
-                            retval = pCell->phenotype.intracellular->start();
-
-                            // std::cerr << "------------->>>>>  Creating rrHandle, loadSBML file\n\n";
-                            // rrc::RRHandle rrHandle = createRRInstance();
-                            // if (!rrc::loadSBML (rrHandle, "CRC_Toy_Model.xml")) {
-                            //     std::cerr << "------------->>>>>  Error while loading SBML file  <-------------\n\n";
-                            // // 	printf ("Error message: %s\n", getLastError());
-                            // // 	getchar ();
-                            // // 	exit (0);
-                            // }
-                            // pCell->phenotype.molecular.model_rr = rrHandle;  // assign the intracellular model to each cell
-                        }
-                        
-                        
-                    }
-			    }
-                for (int i = 0; i < number_of_organoid - (parameters.doubles("percent_KRAS_positive")*number_of_organoid); i++) // seeding number of organoid cells specified in PhysiCell_settings.xml
 			    {
                 
                     std::vector<std::vector<double>> positions = create_cell_sphere_positions(cell_radius,initial_tumor_radius); 
@@ -629,97 +488,58 @@ void setup_tissue( void )
                         // pCell = create_cell(KRAS_negative);
                         pCell = create_cell( *pKRAS_neg );
                         pCell->assign_position( positions[i] );
-                        if (parameters.bools("create_SBML")) {
-                            // Adding SBML model to cells
-                            std::cout << "Adding SBML for Organoids" << std::endl;
-                            retval = pCell->phenotype.intracellular->start();
-
-                            // std::cerr << "------------->>>>>  Creating rrHandle, loadSBML file\n\n";
-                            // rrc::RRHandle rrHandle = createRRInstance();
-                            // if (!rrc::loadSBML (rrHandle, "CRC_Toy_Model.xml")) {
-                            //     std::cerr << "------------->>>>>  Error while loading SBML file  <-------------\n\n";
-                            // // 	printf ("Error message: %s\n", getLastError());
-                            // // 	getchar ();
-                            // // 	exit (0);
-                            // }
-                            // pCell->phenotype.molecular.model_rr = rrHandle;  // assign the intracellular model to each cell
-                        }
-                        
-                        
                     }
 			    }
             }
-            /*
-			for (int i = 0; i < number_of_organoid; i++) // seeding number of organoid cells specified in PhysiCell_settings.xml
-			{
-                
-                std::vector<std::vector<double>> positions = create_cell_sphere_positions(cell_radius,initial_tumor_radius); 
-                //std::cout << "creating " << positions.size() << " closely-packed organoid cells ... " << std::endl;
-                // create organoid
-                    double xrand = (rand() % 5333) - 2666;
-                    double yrand = (rand() % 961) - 480;
-                    double zrand = (rand() % 5333) - 2666;
-                //std::cout << positions.size() << std::endl;
-                for( int i=0; i < positions.size(); i++ )
-                {
-                    positions[i][0] += xrand;//(rand() % 5333) - 2666;
-                    positions[i][1] += yrand;//(rand() % 961) - 480;
-                    positions[i][2] += zrand;//(rand() % 5333) - 2666;
-                    pCell = create_cell(organoid_cell);
-                    pCell->assign_position( positions[i] );
-                    if (parameters.bools("create_SBML")) {
-                        // Adding SBML model to cells
-                        std::cout << "Adding SBML for Organoids" << std::endl;
-                        // std::cerr << "------------->>>>>  Creating rrHandle, loadSBML file\n\n";
-                        rrc::RRHandle rrHandle = createRRInstance();
-                        if (!rrc::loadSBML (rrHandle, "CRC_Toy_Model.xml")) {
-                            std::cerr << "------------->>>>>  Error while loading SBML file  <-------------\n\n";
-                        // 	printf ("Error message: %s\n", getLastError());
-                        // 	getchar ();
-                        // 	exit (0);
-                        }
-                        pCell->phenotype.molecular.model_rr = rrHandle;  // assign the intracellular model to each cell
+            else if (parameters.doubles("organoid_cell_seeding_method") == 3)
+            {
+                for (int i = 0; i < parameters.doubles("percent_KRAS_positive")*number_of_organoid; i++) // seeding number of organoid cells specified in PhysiCell_settings.xml
+			    {
+                    std::vector<std::vector<double>> positions = create_cell_sphere_positions(cell_radius,initial_tumor_radius); 
+                    //std::cout << "creating " << positions.size() << " closely-packed organoid cells ... " << std::endl;
+                    // create organoid
+                        double xrand = (rand() % 5333) - 2666;
+                        double yrand = (rand() % 961) - 480;
+                        double zrand = (rand() % 5333) - 2666;
+                    //std::cout << positions.size() << std::endl;
+                    for( int i=0; i < positions.size(); i++ )
+                    {
+                        positions[i][0] += xrand;//(rand() % 5333) - 2666;
+                        positions[i][1] += yrand;//(rand() % 961) - 480;
+                        positions[i][2] += zrand;//(rand() % 5333) - 2666;
+                        // pCell = create_cell(KRAS_positive);
+                        pCell = create_cell( *pKRAS_pos );
+                        pCell->assign_position( positions[i] );
                     }
-                    
-                    
-                }
+			    }
+
+                for (int i = 0; i < number_of_organoid - (parameters.doubles("percent_KRAS_positive")*number_of_organoid); i++) // seeding number of organoid cells specified in PhysiCell_settings.xml
+			    {
+                    std::vector<std::vector<double>> positions = create_cell_sphere_positions(cell_radius,initial_tumor_radius); 
+                    //std::cout << "creating " << positions.size() << " closely-packed organoid cells ... " << std::endl;
+                    // create organoid
+                        double xrand = (rand() % 5333) - 2666;
+                        double yrand = (rand() % 961) - 480;
+                        double zrand = (rand() % 5333) - 2666;
+                    //std::cout << positions.size() << std::endl;
+                    for( int i=0; i < positions.size(); i++ )
+                    {
+                        positions[i][0] += xrand;//(rand() % 5333) - 2666;
+                        positions[i][1] += yrand;//(rand() % 961) - 480;
+                        positions[i][2] += zrand;//(rand() % 5333) - 2666;
+                        // pCell = create_cell(KRAS_negative);
+                        pCell = create_cell( *pKRAS_neg );
+                        pCell->assign_position( positions[i] );
+                    }
+			    }
 			}
-            */
-	}	
-
-	return; 
-}
-
-void tumor_energy_update_function( Cell* pCell, Phenotype& phenotype , double dt )
-{
-/* 	static int Start_index = live.find_phase_index( PhysiCell_constants::live_cells_cycle_model);
-	static int End_index = live.find_phase_index( PhysiCell_constants::live_cells_cycle_model );
-
-    double tr = phenotype.cycle.data.transition_rate( Start_index,End_index ); */
-    //double i_Oxy_i = pCell->custom_data.find_variable_index( "oxygen_i_conc" );
-    //std::cout << pCell->custom_data[i_Oxy_i] << std::endl;
-    static int apoptosis_model_index = cell_defaults.phenotype.death.find_death_model_index( "Apoptosis" );
-/*     if( pCell->phenotype.death.dead == true )
-    {
-        pCell->functions.custom_cell_rule = NULL; 
-		return; 
-    } */
-    static int lactate_index = microenvironment.find_density_index( "lactate" ); 
-    double lactate_threshold = 0.05;
-    
-    if( pCell->phenotype.death.dead == false && pCell->type == 1 )
-    { 
-        if( pCell->nearest_density_vector()[lactate_index] > lactate_threshold )
-        {
-            std::cout << "Dyiiinnggg" << std::endl;
-            pCell->phenotype.death.rates[apoptosis_model_index] = 0.01;
-        }
     }
-    
-	return;
+
+        // pCell->custom_data[i_Lac_i] = pCell->phenotype.intracellular->get_double_parameter_value("Lactate");
+
+        // phenotype.molecular.internalized_total_substrates[i_Lac] = pCell->custom_data[i_Lac_i]*cell_volume;
+    //    freeRRCData (result);
 }
-
-
 
 std::vector<std::string> my_coloring_function( Cell* pCell )
 {
@@ -738,8 +558,6 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 	
 	return output; 
 }
-
-
 
 std::vector<std::vector<double>> create_cell_sphere_positions(double cell_radius, double sphere_radius)
 {
@@ -768,48 +586,29 @@ std::vector<std::vector<double>> create_cell_sphere_positions(double cell_radius
 		}
 	}
 	return cells;
-	
 }
-/* 
-void update_coarse_microenvironment(void)
-{
-    for( int n = 0 ; n < coarse_well.mesh.voxels.size(); n++ )
-    {
-        std::cout << coarse_well(n)[0] << " ";
-    }
-    
-    std::cout << std::endl;
-    
-    double t_temp = 0;
-    while( t_temp < 100 )
-      {
-          coarse_well.simulate_diffusion_decay( 0.01 );
-          t_temp += 0.01;
-      }
 
-      for( int n = 0 ; n < coarse_well.mesh.voxels.size(); n++ )
-      {
-
-            std::cout << coarse_well(n)[0] << " ";
-
-      }
-      std::cout << std::endl;
-	return; 
-} */
 
 void simulate_SBML_for_cell(Cell* pCell, Phenotype& phenotype , double dt)
 {   
 	// rrc::RRVectorPtr vptr;
 	// rrc::RRCDataPtr result;  // start time, end time, and number of points
 
+        // Custom Data indices
+    static int i_Oxy_i = pCell->custom_data.find_variable_index( "oxygen_i_conc" );
+    static int i_Glu_i = pCell->custom_data.find_variable_index( "glucose_i_conc" );
+    static int i_Glt_i = pCell->custom_data.find_variable_index( "glutamine_i_conc" );
+    static int i_Lac_i = pCell->custom_data.find_variable_index( "lactate_i_conc" );
+    static int energy_vi = pCell->custom_data.find_variable_index( "energy" );
+
 	if( pCell->phenotype.death.dead == false && pCell->type == 1 )
     {
         // SBML indices
-        static int SBML_idx_glucose = 0;
-        static int SBML_idx_oxygen = 1;
-        static int SBML_idx_energy = 2;
-        static int SBML_idx_lactate = 3;
-        static int SBML_idx_glutamine = 4;
+        // static int SBML_idx_glucose = 0;
+        // static int SBML_idx_oxygen = 1;
+        // static int SBML_idx_energy = 2;
+        // static int SBML_idx_lactate = 3;
+        // static int SBML_idx_glutamine = 4;
 
         // rrc::RRVectorPtr vptr;
         // rrc::RRCDataPtr result;
@@ -828,11 +627,12 @@ void simulate_SBML_for_cell(Cell* pCell, Phenotype& phenotype , double dt)
         //std::cout << internal_oxygen << "," << phenotype.volume.total << std::endl;
         
         // Custom Data indices
-        static int i_Oxy_i = pCell->custom_data.find_variable_index( "oxygen_i_conc" );
-        static int i_Glu_i = pCell->custom_data.find_variable_index( "glucose_i_conc" );
-        static int i_Glt_i = pCell->custom_data.find_variable_index( "glutamine_i_conc" );
-        static int i_Lac_i = pCell->custom_data.find_variable_index( "lactate_i_conc" );
-        static int energy_vi = pCell->custom_data.find_variable_index( "energy" );
+        // static int i_Oxy_i = pCell->custom_data.find_variable_index( "oxygen_i_conc" );
+        // static int i_Glu_i = pCell->custom_data.find_variable_index( "glucose_i_conc" );
+        // static int i_Glt_i = pCell->custom_data.find_variable_index( "glutamine_i_conc" );
+        // static int i_Lac_i = pCell->custom_data.find_variable_index( "lactate_i_conc" );
+        // static int energy_vi = pCell->custom_data.find_variable_index( "energy" );
+
         double cell_volume = phenotype.volume.total;
 
         // Calculating internal concentrations & Updating cell data
@@ -859,18 +659,18 @@ void simulate_SBML_for_cell(Cell* pCell, Phenotype& phenotype , double dt)
         // Geting molecular model structure
         // vptr = rrc::getFloatingSpeciesConcentrations(pCell->phenotype.molecular.model_rr);
         
-        // rwh
-        int retval;
         // Setting New Values to SBML
         // vptr->Data[SBML_idx_oxygen] = pCell->custom_data[i_Oxy_i];
-        retval = pCell->phenotype.intracellular->set_parameter_value("Oxygen", pCell->custom_data[i_Oxy_i]);
         // vptr->Data[SBML_idx_glucose] = pCell->custom_data[i_Glu_i];
-        retval = pCell->phenotype.intracellular->set_parameter_value("Glucose", pCell->custom_data[i_Glu_i]);
         // vptr->Data[SBML_idx_lactate] = pCell->custom_data[i_Lac_i];
-        retval = pCell->phenotype.intracellular->set_parameter_value("Lactate", pCell->custom_data[i_Lac_i]);
         // vptr->Data[SBML_idx_glutamine] = pCell->custom_data[i_Glt_i];
-        retval = pCell->phenotype.intracellular->set_parameter_value("Glutamine", pCell->custom_data[i_Glt_i]);
         // vptr->Data[SBML_idx_energy] = pCell->custom_data[energy_vi];
+
+        int retval;
+        retval = pCell->phenotype.intracellular->set_parameter_value("Oxygen", pCell->custom_data[i_Oxy_i]);
+        retval = pCell->phenotype.intracellular->set_parameter_value("Glucose", pCell->custom_data[i_Glu_i]);
+        retval = pCell->phenotype.intracellular->set_parameter_value("Lactate", pCell->custom_data[i_Lac_i]);
+        retval = pCell->phenotype.intracellular->set_parameter_value("Glutamine", pCell->custom_data[i_Glt_i]);
         retval = pCell->phenotype.intracellular->set_parameter_value("Energy", pCell->custom_data[energy_vi]);
         
         // rrc::setFloatingSpeciesConcentrations(pCell->phenotype.molecular.model_rr, vptr);
@@ -878,14 +678,10 @@ void simulate_SBML_for_cell(Cell* pCell, Phenotype& phenotype , double dt)
         //std::cout << "Before Simulation Glucose: " << vptr->Data[SBML_idx_glucose] << std::endl;
         // SBML Simulation
         // result = rrc::simulateEx (pCell->phenotype.molecular.model_rr, 0, 0.01, 2);  // start time, end time, and number of points
-        pCell->phenotype.intracellular->update();  // run solver (rwh)
-        
-
+        retval = pCell->phenotype.intracellular->update();
         
         //std::cout << result->ColumnHeaders[0] << result->Data[6] << std::endl;
-        
         //std::cout << "After Simulation Energy: " << result->Data[8] << std::endl;
-        
         
     /*     std::cout << "--- after simulation:" << std::endl;
         for (int idx=0; idx<vptr->Count; idx++)
@@ -893,8 +689,6 @@ void simulate_SBML_for_cell(Cell* pCell, Phenotype& phenotype , double dt)
             std::cout << idx << ", " << vptr->Data[idx] << std::endl;
         } */
         /////////---------------Simulation Demo-----------------------///////
-
-
         //int idx = (result->RSize - 1) * result->CSize + 1;
         //std::cout << "Cell ID 0) Saving last energy value (cell custom var) = " << result->Data[idx] << std::endl;
     /*     for (int idx=0; idx<20; idx++)
@@ -903,18 +697,16 @@ void simulate_SBML_for_cell(Cell* pCell, Phenotype& phenotype , double dt)
         } */
 
         // Result Indicing!!!!!
+        // pCell->custom_data[i_Glu_i] = result->Data[7];
+        // pCell->custom_data[i_Oxy_i] = result->Data[8];
+        // pCell->custom_data[energy_vi] = result->Data[9];
+        // //std::cout << "Energy: " << pCell->custom_data[energy_vi] << std::endl;
+        // pCell->custom_data[i_Lac_i] = result->Data[10];
+        // pCell->custom_data[i_Glt_i] = result->Data[11];
 
-
-
-        // pCell->custom_data[i_Glu_i]  = result->Data[7];
-        // pCell->custom_data[i_Oxy_i]  = result->Data[8];
-        // pCell->custom_data[energy_vi]  = result->Data[9];
         pCell->custom_data[i_Glu_i] = pCell->phenotype.intracellular->get_double_parameter_value("Glucose");
         pCell->custom_data[i_Oxy_i] = pCell->phenotype.intracellular->get_double_parameter_value("Oxygen");
         pCell->custom_data[energy_vi] = pCell->phenotype.intracellular->get_double_parameter_value("Energy");
-        //std::cout << "Energy: " << pCell->custom_data[energy_vi] << std::endl;
-        // pCell->custom_data[i_Lac_i] = result->Data[10];
-        // pCell->custom_data[i_Glt_i] = result->Data[11];
         pCell->custom_data[i_Lac_i] = pCell->phenotype.intracellular->get_double_parameter_value("Lactate");
         pCell->custom_data[i_Glt_i] = pCell->phenotype.intracellular->get_double_parameter_value("Glutamine");
         
@@ -930,6 +722,7 @@ void simulate_SBML_for_cell(Cell* pCell, Phenotype& phenotype , double dt)
     {
         // SBML indices
         static int SBML_idx_lactate = 0;
+        int retval;
 
         // rrc::RRVectorPtr vptr;
         // rrc::RRCDataPtr result;
@@ -942,7 +735,7 @@ void simulate_SBML_for_cell(Cell* pCell, Phenotype& phenotype , double dt)
         //std::cout << internal_oxygen << "," << phenotype.volume.total << std::endl;
         
         // Custom Data indices
-        double i_Lac_i = pCell->custom_data.find_variable_index( "lactate_i_conc" );
+        // double i_Lac_i = pCell->custom_data.find_variable_index( "lactate_i_conc" );
         double cell_volume = phenotype.volume.total;
 
         // Calculating internal concentrations & Updating cell data
@@ -954,24 +747,18 @@ void simulate_SBML_for_cell(Cell* pCell, Phenotype& phenotype , double dt)
         
         // Setting New Values to SBML
         // vptr->Data[SBML_idx_lactate] = pCell->custom_data[i_Lac_i];
-        int retval = pCell->phenotype.intracellular->set_parameter_value("Lactate", pCell->custom_data[i_Lac_i]);
+        retval = pCell->phenotype.intracellular->set_parameter_value("Lactate", pCell->custom_data[i_Lac_i]);
         
         // rrc::setFloatingSpeciesConcentrations(pCell->phenotype.molecular.model_rr, vptr);
         
         //std::cout << "Before Simulation Glucose: " << vptr->Data[SBML_idx_glucose] << std::endl;
         // SBML Simulation
         // result = rrc::simulateEx (pCell->phenotype.molecular.model_rr, 0, 0.01, 2);  // start time, end time, and number of points
-        pCell->phenotype.intracellular->update();  // run solver (rwh)
-        
+        retval = pCell->phenotype.intracellular->update();
  
-        
         //std::cout << result->ColumnHeaders[1] << result->Data[3] << std::endl;
-        
         //std::cout << "After Simulation Energy: " << result->Data[8] << std::endl;
-        
-
         // Result Indicing!!!!!
-
         //std::cout << "Energy: " << pCell->custom_data[energy_vi] << std::endl;
         // pCell->custom_data[i_Lac_i] = result->Data[3];
         pCell->custom_data[i_Lac_i] = pCell->phenotype.intracellular->get_double_parameter_value("Lactate");
@@ -979,11 +766,7 @@ void simulate_SBML_for_cell(Cell* pCell, Phenotype& phenotype , double dt)
         phenotype.molecular.internalized_total_substrates[i_Lac] = pCell->custom_data[i_Lac_i]*cell_volume;
     //    freeRRCData (result);
     }
-
-    
-    
 }
-
 
 void simulate_SBML_for_all_cells(void) 
 {

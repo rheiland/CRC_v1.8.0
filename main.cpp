@@ -172,12 +172,15 @@ int main( int argc, char* argv[] )
 	Cell_Container* cell_container = create_cell_container_for_microenvironment( microenvironment, mechanics_voxel_size );
 	
 	/* Users typically start modifying here. START USERMODS */ 
-	std::cout << "creating cell types" << std::endl; 
+	std::cout << "main.cpp: creating cell types" << std::endl; 
 	create_cell_types();
-    std::cout << "done creating cell types" << std::endl; 
-	std::cout << "setting up tissue" << std::endl; 
+    std::cout << "main.cpp:  done creating cell types" << std::endl; 
+
+	std::cout << "main.cpp:  setting up tissue" << std::endl; 
 	setup_tissue();
-    std::cout << "done with setting up tissue" << std::endl; 
+    std::cout << "main.cpp:  done with setting up tissue" << std::endl; 
+    std::cout << "main.cpp:  # cells = " << (*all_cells).size() << std::endl; 
+
 	/* Users typically stop modifying here. END USERMODS */ 
 	
 	// set MultiCellDS save options 
