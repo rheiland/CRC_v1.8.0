@@ -424,38 +424,69 @@ void setup_tissue( void )
     static Cell_Definition* pKRAS_pos = find_cell_definition("KRAS_positive");
     static Cell_Definition* pKRAS_neg = find_cell_definition("KRAS_negative");
 
+    // std::cout << "setup_tissue:  *pFibro.type = " << *pFibro->type << std::endl;
+
     // 20,000 fibroblast seeding
+    int kfib = 0;
     if (parameters.bools("fibroblast_seeding"))
     {
         std::cout << "creating fibroblasts" << std::endl;
-        for (int i= -2666; i<2666; i+=16.82+20.8)
+        for (int i= -2666; i<2666; i+=16.82+20.8)  //rwh??
         {
-            for (int j= -2666; j<2666; j+=16.82+20.8)
+            for (int j= -2666; j<2666; j+=16.82+20.8)  //rwh??
             {			
+                kfib += 1;
                 // pCell = create_cell(fibroblast);
                 pCell = create_cell( *pFibro );
                 pCell->assign_position(i,-500,j);
             } 	
         }  
     }
+    std::cout << "------ created # fibroblasts = " << kfib << std::endl;
 
     double cell_radius = cell_defaults.phenotype.geometry.radius; 
-    double initial_tumor_radius = 46; // parameters.doubles("initial_tumor_radius");
-    double number_of_organoid = 250; //parameters.doubles("number_of_organoid")
+    // double initial_tumor_radius = 46; // parameters.doubles("initial_tumor_radius");
+    double initial_tumor_radius = parameters.doubles("initial_tumor_radius");
+    std::cout << "------ initial_tumor_radius = " << initial_tumor_radius << std::endl;
+
+    //rwh
+    // double number_of_organoid = 250; //parameters.doubles("number_of_organoid")
+    // int number_of_organoid = 250; // parameters.doubles("number_of_organoid")
+    int number_of_organoids = parameters.ints("number_of_organoids");
+    std::cout << "------ number_of_organoids = " << number_of_organoids << std::endl;
     
+    double xmin=1.e6;
+    double ymin=1.e6;
+    double zmin=1.e6;
+    double xmax= -xmin;
+    double ymax= -ymin;
+    double zmax= -zmin;
 	if (parameters.bools("organoid_cell_seeding"))
-	{ 
-            std::cout << "creating CRCs" << std::endl;
-            if (parameters.doubles("organoid_cell_seeding_method") == 1)
+	{
+            // std::cout << "creating CRCs" << std::endl;
+            // rwh: if (parameters.doubles("organoid_cell_seeding_method") == 1)
+            if (parameters.ints("organoid_cell_seeding_method") == 1)  // only KRAS_pos
             {
-                for (int i = 0; i < number_of_organoid; i++) // seeding number of organoid cells specified in PhysiCell_settings.xml
+                std::cout << "  - seeding method = 1" << std::endl;
+                //rwh for (int i = 0; i < number_of_organoid; i++) // seeding number of organoid cells specified in PhysiCell_settings.xml
+                int kdx = 0;
+                for (int idx = 0; idx < number_of_organoids; idx++) // seeding number of organoid cells specified in PhysiCell_settings.xml
 			    {
+                    //rwh - why??  and why in this loop?
                     std::vector<std::vector<double>> positions = create_cell_sphere_positions(cell_radius,initial_tumor_radius); 
                     //std::cout << "creating " << positions.size() << " closely-packed organoid cells ... " << std::endl;
                     // create organoid
+                        //rwh: create values in range: rand() % (max_number + 1 - minimum_number) + minimum_number; e.g.
+                        // [2666, 5333+2666-1] = 2666, 
                         double xrand = (rand() % 5333) - 2666;
                         double yrand = (rand() % 961) - 480;
                         double zrand = (rand() % 5333) - 2666;
+                        if (xrand < xmin) xmin = xrand;
+                        if (xrand > xmax) xmax = xrand;
+                        if (yrand < ymin) ymin = yrand;
+                        if (yrand > ymax) ymax = yrand;
+                        if (zrand < zmin) zmin = zrand;
+                        if (zrand > zmax) zmax = zrand;
                     //std::cout << positions.size() << std::endl;
                     for( int i=0; i < positions.size(); i++ )
                     {
@@ -465,12 +496,17 @@ void setup_tissue( void )
                         // pCell = create_cell(KRAS_positive);
                         pCell = create_cell( *pKRAS_pos );
                         pCell->assign_position( positions[i] );
+                        kdx += 1;
                     }
 			    }
+                std::cout << " -----  # of KRAS_pos cells = " << kdx << std::endl;
             }
-            else if (parameters.doubles("organoid_cell_seeding_method") == 2)
+            //---------------------------------------------------
+            // else if (parameters.doubles("organoid_cell_seeding_method") == 2)
+            else if (parameters.ints("organoid_cell_seeding_method") == 2) // only KRAS_neg
             {
-                for (int i = 0; i < number_of_organoid; i++) // seeding number of organoid cells specified in PhysiCell_settings.xml
+                std::cout << "  - seeding method = 2 (only KRAS_neg)" << std::endl;
+                for (int i = 0; i < number_of_organoids; i++) // seeding number of organoid cells specified in PhysiCell_settings.xml
 			    {
                 
                     std::vector<std::vector<double>> positions = create_cell_sphere_positions(cell_radius,initial_tumor_radius); 
@@ -479,6 +515,12 @@ void setup_tissue( void )
                         double xrand = (rand() % 5333) - 2666;
                         double yrand = (rand() % 961) - 480;
                         double zrand = (rand() % 5333) - 2666;
+                        if (xrand < xmin) xmin = xrand;
+                        if (xrand > xmax) xmax = xrand;
+                        if (yrand < ymin) ymin = yrand;
+                        if (yrand > ymax) ymax = yrand;
+                        if (zrand < zmin) zmin = zrand;
+                        if (zrand > zmax) zmax = zrand;
                     //std::cout << positions.size() << std::endl;
                     for( int i=0; i < positions.size(); i++ )
                     {
@@ -491,48 +533,75 @@ void setup_tissue( void )
                     }
 			    }
             }
-            else if (parameters.doubles("organoid_cell_seeding_method") == 3)
+            //---------------------------------------------------
+            // else if (parameters.doubles("organoid_cell_seeding_method") == 3)
+            else if (parameters.ints("organoid_cell_seeding_method") == 3) // both KRAS_pos, KRAS_neg
             {
-                for (int i = 0; i < parameters.doubles("percent_KRAS_positive")*number_of_organoid; i++) // seeding number of organoid cells specified in PhysiCell_settings.xml
+                std::cout << "  - seeding method = 3 (both KRAS_pos, KRAS_neg)" << std::endl;
+
+                int num_kras_pos_organoids = parameters.doubles("percent_KRAS_positive") * number_of_organoids;
+                std::cout << "  num_kras_pos_organoids = " << num_kras_pos_organoids  << std::endl;
+
+                //rwh: argh, re-use of for loop var "i" in inner loop
+                // for (int i = 0; i < num_kras_pos_organoids; i++) // seeding number of organoid cells specified in PhysiCell_settings.xml
+                for (int idx = 0; idx < num_kras_pos_organoids; idx++) // seeding number of organoid cells specified in PhysiCell_settings.xml
 			    {
                     std::vector<std::vector<double>> positions = create_cell_sphere_positions(cell_radius,initial_tumor_radius); 
                     //std::cout << "creating " << positions.size() << " closely-packed organoid cells ... " << std::endl;
                     // create organoid
-                        double xrand = (rand() % 5333) - 2666;
-                        double yrand = (rand() % 961) - 480;
-                        double zrand = (rand() % 5333) - 2666;
+                    double xrand = (rand() % 5333) - 2666;
+                    double yrand = (rand() % 961) - 480;
+                    double zrand = (rand() % 5333) - 2666;
+
+                    if (xrand < xmin) xmin = xrand;
+                    if (xrand > xmax) xmax = xrand;
+                    if (yrand < ymin) ymin = yrand;
+                    if (yrand > ymax) ymax = yrand;
+                    if (zrand < zmin) zmin = zrand;
+                    if (zrand > zmax) zmax = zrand;
                     //std::cout << positions.size() << std::endl;
                     for( int i=0; i < positions.size(); i++ )
                     {
                         positions[i][0] += xrand;//(rand() % 5333) - 2666;
                         positions[i][1] += yrand;//(rand() % 961) - 480;
                         positions[i][2] += zrand;//(rand() % 5333) - 2666;
+
                         // pCell = create_cell(KRAS_positive);
                         pCell = create_cell( *pKRAS_pos );
                         pCell->assign_position( positions[i] );
                     }
 			    }
 
-                for (int i = 0; i < number_of_organoid - (parameters.doubles("percent_KRAS_positive")*number_of_organoid); i++) // seeding number of organoid cells specified in PhysiCell_settings.xml
+                int num_kras_neg_organoids = number_of_organoids - parameters.doubles("percent_KRAS_positive") * number_of_organoids;
+                std::cout << "  num_kras_neg_organoids = " << num_kras_neg_organoids  << std::endl;
+
+                //rwh: avoid duplicate, nested "for" loop var name
+                // for (int i = 0; i < num_kras_neg_organoids; i++) // seeding number of organoid cells specified in PhysiCell_settings.xml
+                for (int idx = 0; idx < num_kras_neg_organoids; idx++) // seeding number of organoid cells specified in PhysiCell_settings.xml
 			    {
                     std::vector<std::vector<double>> positions = create_cell_sphere_positions(cell_radius,initial_tumor_radius); 
                     //std::cout << "creating " << positions.size() << " closely-packed organoid cells ... " << std::endl;
                     // create organoid
-                        double xrand = (rand() % 5333) - 2666;
-                        double yrand = (rand() % 961) - 480;
-                        double zrand = (rand() % 5333) - 2666;
+                    double xrand = (rand() % 5333) - 2666;
+                    double yrand = (rand() % 961) - 480;
+                    double zrand = (rand() % 5333) - 2666;
                     //std::cout << positions.size() << std::endl;
                     for( int i=0; i < positions.size(); i++ )
                     {
                         positions[i][0] += xrand;//(rand() % 5333) - 2666;
                         positions[i][1] += yrand;//(rand() % 961) - 480;
                         positions[i][2] += zrand;//(rand() % 5333) - 2666;
+
                         // pCell = create_cell(KRAS_negative);
                         pCell = create_cell( *pKRAS_neg );
                         pCell->assign_position( positions[i] );
                     }
 			    }
 			}
+        std::cout << "------- organoid seed cells ranges:\n";
+        std::cout << " x: " << xmin << ", " << xmax << std::endl;
+        std::cout << " y: " << ymin << ", " << ymax << std::endl;
+        std::cout << " z: " << zmin << ", " << zmax << std::endl;
     }
 
         // pCell->custom_data[i_Lac_i] = pCell->phenotype.intracellular->get_double_parameter_value("Lactate");
