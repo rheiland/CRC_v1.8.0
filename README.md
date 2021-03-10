@@ -1,3 +1,23 @@
+```
+.../CRC_v1.8.0/output$ crc
+...
+
+.../CRC_v1.8.0/output$ python fury_vis.py 
+time (mins)= 1.0
+time (days)= 0.0006944444444444445
+dict_keys(['ID', 'position_x', 'position_y', 'position_z', 'total_volume', 'cell_type', 'cycle_model', 'current_phase', 
+'elapsed_time_in_phase', 'nuclear_volume', 'cytoplasmic_volume', 'fluid_fraction', 'calcified_fraction', 'orientation_x', 
+'orientation_y', 'orientation_z', 'polarity', 'migration_speed', 'motility_vector_x', 'motility_vector_y', 'motility_vector_z', 
+'migration_bias', 'motility_bias_direction_x', 'motility_bias_direction_y', 'motility_bias_direction_z', 'persistence_time', 
+'motility_reserved', 'organoid_number', 'oxygen_i_conc', 'glucose_i_conc', 'glutamine_i_conc', 'lactate_i_conc', 'energy'])
+num cells originally =  48093
+cell_type min, max=  1.0 3.0
+cell_phase min, max=  14.0 100.0
+```
+![alt cells at 1 min](images/cells_1min.png)
+
+---
+
 # PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems.
 
 **Version:** 1.8.0
