@@ -5,9 +5,9 @@
 
 We currently provide 2 options for downloading the PhysiCell source code:
 
-1) from https://sourceforge.net/projects/physicell/.
+* https://sourceforge.net/projects/physicell/.
 
-2) from https://github.com/MathCancer/PhysiCell/releases.
+* https://github.com/MathCancer/PhysiCell/releases.
 
 For more detailed information, see Section 3 of the User Guide (in `/documentation`)
 and/or also http://www.mathcancer.org/blog/physicell-tutorials/.
@@ -62,8 +62,8 @@ building PhysiCell. If not, contact us!
 
 ## Build: sample projects
 
-We provide (at least) six sample projects to help you get started. Five
-of the projects are 2D models (<i>biorobots, anti-cancer biorobots, cancer heterogeneity, virus-macrophage, and predator-prey-farmer</i>); a sixth project
+We provide several sample projects to help you get started. Most
+of the projects are 2D models (<i>biorobots, anti-cancer biorobots, cancer heterogeneity, virus-macrophage, predator-prey-farmer, and worms</i>); but one project
 is a 3D model (<i>cancer immunology</i>). The procedure to build and execute each of the sample projects follows the same
 pattern. For example, from your Terminal, in the root PhysiCell directory/folder:
 ```
@@ -82,7 +82,7 @@ $ ./biorobots
 ```
 This will begin the simulation, write information to your terminal, and generate output files of types `.svg`, `.xml`, and `.mat`. More about those below. You can `Control-c` to kill the simulation early, if you want.
 
-For the remaining three example projects provided with PhysiCell, you would follow similar steps, but first, you may want to clean out the previous simulation's output and prepare for the new one:
+For the remaining example projects provided with PhysiCell, you would follow similar steps, but first, you may want to clean out the previous simulation's output and prepare for the new one:
 ```
 $ make data-cleanup   # Delete output data. (Optionally, manually move it to another directory to keep it)
 $ make reset          # clear out the sample project / clean slate
@@ -118,6 +118,14 @@ and
 ```
 $ make data-cleanup
 $ make reset
+$ make worm-sample
+$ make 
+$ ./worm
+```
+and the 3-D model (more computationally intensive):
+```
+$ make data-cleanup
+$ make reset
 $ make cancer-immune-sample
 $ make
 $ ./cancer_immune_3D
@@ -127,10 +135,10 @@ $ ./cancer_immune_3D
 
 ## Visualizing Output
 
-PhysiCell does not currently provide a GUI for visualizing output results. Our approach, at least for now,
+PhysiCell does not currently provide a GUI for visualizing output results. Our approach, for now,
 is to suggest and offer guidance on using other tools, e.g. your browser, [ImageMagick](https://www.imagemagick.org), 
 [MATLAB](https://www.mathworks.com/products/matlab.html), [Octave](https://octave.sourceforge.io/), 
-[ParaView](https://www.paraview.org/), and more.
+Python, and [ParaView](https://www.paraview.org/).
 
 ### Browser
 
@@ -144,6 +152,11 @@ default, using a slice through the Z=0 plane, as depicted in the following image
 
 If you have access to MATLAB (or Octave), we have a [detailed tutorial](http://www.mathcancer.org/blog/working-with-physicell-snapshots-in-matlab/) on how to visualize the
 MultiCellDS digital snapshots (.xml and .mat files).
+
+### Python
+
+If you want to use Python to visualize results, see this blog post http://www.mathcancer.org/blog/python-loader/ and also see various scripts in 
+the `/beta` directory, e.g., `anim_svg.py`.
 
 ### ImageMagick
 
@@ -172,7 +185,7 @@ Since PhysiCell 1.8.0, there are helper targets in the Makefile that will perfor
 $ make jpeg   # convert all output/snapshot*.svg to .jpg
 $ make gif    # create out.gif from output/snapshot*.svg 
 $ make movie  # assuming you have ffmpeg, create out.mp4 from output/snapshot*.jpg
-and you can also specify the name of the output directory, e.g.:
+  You can also specify the name of the output directory, e.g.:
 $ make jpeg OUTPUT=out1
 ```
 
