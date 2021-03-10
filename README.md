@@ -16,6 +16,10 @@ cell_phase min, max=  14.0 100.0
 ```
 ![alt cells at 1 min](images/cells_1min.png)
 
+Among the many tests that need to be performed for the model's correctness, we need to also be sure there isn't runaway memory due to, for example, libRoadrunner not freeing memory that it allocates. The following seems to be the constant memory usage, at least at the beginning of a simulation. Obviously, it will increase if/when cell proliferation occurs.
+
+![alt check memory](images/memory_check.png)
+
 ---
 
 # PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems.
